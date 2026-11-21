@@ -1,113 +1,116 @@
-# Password Strength Checker
+# Password Strength Checker (v2)
 
-This is a beginner-friendly Python program that checks the strength of a password.
+A small command-line Python program that rates a password as **Weak, Medium or Strong** and gives suggestions to improve it.
 
-It tells the user whether a password is **weak, medium, or strong**. It also gives simple suggestions to make the password better.
+This is a beginner project. I built it while learning Python, and I used AI tools to help me with explanations and debugging. This version improves on v1 by adding an entropy estimate and a common-password check.
 
-## What the program checks
+## What it does
 
-The program checks whether a password has:
+When you enter a password, the program:
 
-- At least 8 characters
-- At least 12 characters for better security
-- At least one lowercase letter (a–z)
-- At least one uppercase letter (A–Z)
-- At least one number (0–9)
-- At least one special character, such as `!`, `@`, `#`, or `$`
+1. Checks the password character by character (lowercase, uppercase, number, special character).
+2. Checks length (at least 8 and at least 12 characters).
+3. Prints a **theoretical entropy estimate** in bits.
+4. Compares the lowercase version of the password against a small built-in list of common passwords.
+5. Prints a rating and a list of suggestions.
 
-## How it works
-
-1. The program asks the user to enter a password.
-2. It checks every character in the password using a `for` loop.
-3. It uses Boolean flags to remember whether the password has:
-   - A lowercase letter
-   - An uppercase letter
-   - A number
-   - A special character
-4. It increases a `count` for every security condition the password meets.
-5. If a condition is missing, the program adds a suggestion to the `tips` list.
-6. Finally, it shows the password strength and improvement suggestions.
-
-## Password strength rules
-
-| Condition | Result |
+## How the rating works
+| Situation | Result |
 |---|---|
-| Password has fewer than 8 characters | Weak password |
-| Password has 8 or more characters but meets 4 or fewer conditions | Medium password |
-| Password meets more than 4 conditions | Strong password |
+| The lowercase password is in the built-in common-password list | Weak |
+| The password is empty | Weak |
+| The password is shorter than 8 characters | Weak |
+| The password meets all 6 checks (8+ characters, 12+ characters, lowercase, uppercase, number, special character) | Strong |
+| Anything else | Medium |
 
-## Example
-
-If the user enters:
-
-```text
-abc
-```
-
-The program will show:
+The entropy number is printed for information only. It does **not** change the rating.
+## Example runs
+Common password (caught even with different capital letters):
 
 ```text
-Weak password
+Enter the password: PASSWORD
+Entropy (theoretical, assumes random choice): 37.6 bits
+Warning: This password is easily detectable.
+Password Strength: Weak
 Suggestions to improve your password:
-- Use at least 8 characters
 - Use at least 12 characters for better security
-- Add a uppercase letter
+- Add a lowercase letter
 - Add a number
 - Add a special character
 ```
 
-## Concepts used
+Medium password:
 
-This project uses basic Python concepts:
+```text
+Enter the password: correcthorsebatterystaple
+Entropy (theoretical, assumes random choice): 117.51 bits
+Not found in my small list of common passwords.
+Password Strength: Medium
+Suggestions to improve your password:
+- Add an uppercase letter
+- Add a number
+- Add a special character
+```
 
-- `input()` to take user input
-- `for` loop to check each character
-- `if`, `elif`, and `else` statements
-- Boolean variables, such as `lowercase_found`
-- Lists and `append()` to store suggestions
-- String methods: `islower()`, `isupper()`, `isdigit()`, and `isalnum()`
-- `len()` to check password length
+Strong password:
+
+```text
+Enter the password: Summer2024!!
+Entropy (theoretical, assumes random choice): 78.66 bits
+Not found in my small list of common passwords.
+Password Strength: Strong
+This password meets this checker's basic rules
+Use a unique password for every account.
+```
+
+## Known limitations
+
+This tool is a learning project and is **not** a reliable way to judge real password security. Known problems:
+
+- **Small common-password list.** It only checks a short list of common passwords. A password like `password123` or `p@ssw0rd2024` is not in the list, so it is not caught.
+- **Predictable patterns score as Strong.** `Summer2024!!` is rated Strong because it meets all the rules, but a word, a year and symbols is a very predictable pattern.
+- **Long passphrases can score only Medium.** `correcthorsebatterystaple` is long and hard to guess, but it has only lowercase letters, so the rules rate it Medium.
+- **Entropy is a theoretical maximum.** The formula assumes every character was chosen randomly. People do not choose passwords randomly, so the number overestimates real strength.
+- **No pattern checks.** It does not look for repeated characters, keyboard patterns (like `qwerty`) or sequences (like `abcd` or `1234`), except for the few that are in the list.
+- **Passwords in other scripts.** Letters from scripts like Urdu are not counted as lowercase or uppercase, so the suggestions can be wrong for them.
+- **The password is visible when typed.** The program uses `input()`, so the password shows on screen.
+- **Not a security tool.** It checks only the password text. It cannot tell whether a password has appeared in a data breach.
 
 ## How to run
 
-1. Install Python on your computer.
-2. Save the file as `password_checker.py`.
-3. Open a terminal or command prompt.
-4. Run this command:
+1. Install Python 3.
+2. Download `password_strength_checker_v2.py`.
+3. Open a terminal in the folder with the file.
+4. Run:
 
 ```bash
-python password_checker.py
+python password_strength_checker_v2.py
 ```
 
-5. Enter a password when the program asks.
+5. Type a password when asked.
 
-## Screenshots
+The program does not store or send the password anywhere. It only reads it and prints a result.
 
-### Weak password example
+## Concepts used
 
-![Weak password example](screenshots/weak_password.png)
-
-### Medium password example
-
-![Medium password example](screenshots/medium_password.png)
-
-### Strong password example
-
-![Strong password example](screenshots/strong_password.png)
-
-## Important security note
-
-A strong password should be long and unique. Do not use the same password for many accounts.
-
-For better security, use a long password or passphrase and enable two-factor authentication (2FA) when it is available.
+- `input()`, `print()` and `len()`
+- `for` loops and `if` / `elif` / `else`
+- Boolean variables and a counter
+- Lists and `append()`
+- String methods: `islower()`, `isupper()`, `isdigit()`, `isalnum()`, `lower()`
+- `math.log2()` for the entropy estimate
 
 ## Future improvements
 
-- Add a Streamlit web interface
-- Improve the password strength rules
-- Add more detailed suggestions
+Things I plan to learn and add:
 
-## License
+- Use `getpass` so the password is not shown on screen
+- Put the checks into functions and write simple tests
+- Load a larger common-password list from a file
+- Catch simple tricks such as `@` for `a` and trailing numbers
+- Check for repeated characters and sequences
 
-This project is for learning and portfolio purposes.
-You may not copy, reuse, modify, distribute, or claim this code as your own without my written permission.
+## Version history
+
+- **v1:** length and character-type checks, with weak / medium / strong rating.
+- **v2:** added entropy estimate, common-password check (case-insensitive), clearer tips and a limitations section.
